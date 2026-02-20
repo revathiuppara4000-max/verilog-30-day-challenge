@@ -1,0 +1,42 @@
+module mux4to1(
+    input I0,I1,I2,I3,
+    input S0,S1,
+    output reg Y
+);
+always @(*) begin
+    case({S1,S0})
+        2'b00: Y = I0;
+        2'b01: Y = I1;
+        2'b10: Y = I2;
+        2'b11: Y = I3;
+    endcase
+end
+endmodule
+
+
+//tb
+`timescale 1ns/1ps
+module mux4to1_tb;
+reg I0,I1,I2,I3;
+reg S0,S1;
+wire Y;
+mux4to1 dut(
+    .I0(I0),
+    .I1(I1),
+    .I2(I2),
+    .I3(I3),
+    .S0(S0),
+    .S1(S1),
+    .Y(Y)
+);
+initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0,mux4to1_tb);
+    I0=1; I1=0; I2=1; I3=0;
+    S1=0; S0=0; #10;
+    S1=0; S0=1; #10;
+    S1=1; S0=0; #10;
+    S1=1; S0=1; #10;
+    $finish;
+end
+endmodule
