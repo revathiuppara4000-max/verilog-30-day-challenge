@@ -1,1 +1,36 @@
+module priority_encoder4x2(
+input I0,I1,I2,I3,
+output reg Y0,Y1
+);
+always @(*) begin
+    if(I3)      {Y1,Y0}=2'b11;
+    else if(I2) {Y1,Y0}=2'b10;
+    else if(I1) {Y1,Y0}=2'b01;
+    else        {Y1,Y0}=2'b00;
+end
+endmodule
 
+//testbench
+
+`timescale 1ns/1ps
+module priority_encoder4x2_tb;
+reg I0,I1,I2,I3;
+wire Y0,Y1;
+priority_encoder4x2 dut(
+    .I0(I0),
+    .I1(I1),
+    .I2(I2),
+    .I3(I3),
+    .Y0(Y0),
+    .Y1(Y1)
+);
+initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0,priority_encoder4x2_tb);
+    I0=1; I1=0; I2=0; I3=0; #10;
+    I0=1; I1=1; I2=0; I3=0; #10;
+    I0=0; I1=1; I2=1; I3=0; #10;
+    I0=1; I1=1; I2=1; I3=1; #10;
+    $finish;
+end
+endmodule
