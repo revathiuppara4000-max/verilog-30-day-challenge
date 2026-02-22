@@ -1,0 +1,35 @@
+module barrel_shifter(
+    input  [3:0] in,
+    input  [1:0] n,
+    input  lr,
+    output reg [3:0] out
+);
+always @(*) begin
+    if(lr == 1'b0)
+        out = in << n;
+    else
+        out = in >> n;
+end
+endmodule
+
+//testbench
+`timescale 1ns/1ps
+module barrel_shifter_tb;
+reg [3:0] in;
+reg [1:0] n;
+reg lr;
+wire [3:0] out;
+barrel_shifter dut(in,n,lr,out);
+initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0,barrel_shifter_tb);
+    in = 4'b1011;
+    lr=0; n=2'b00; #10;
+    lr=0; n=2'b01; #10;
+    lr=0; n=2'b10; #10;
+    lr=1; n=2'b01; #10;
+    lr=1; n=2'b10; #10;
+    $finish;
+end
+endmodule
+
