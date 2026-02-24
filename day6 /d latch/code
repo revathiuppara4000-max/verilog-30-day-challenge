@@ -1,1 +1,42 @@
+module d_latch (
+    input D,
+    input EN,
+    output reg Q
+);
+always @ (D or EN)
+begin
+    if (EN == 1'b1)
+        Q = D;
+end
+endmodule
 
+
+//tb
+
+`timescale 1ns/1ps
+
+module tb;
+
+reg D;
+reg EN;
+wire Q;
+
+d_latch dut(D, EN, Q);
+
+initial
+begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0,tb);
+
+    D=0; EN=0;
+    #10 EN=1;
+    #10 D=1;
+    #10 D=0;
+    #10 EN=0;
+    #10 D=1;
+    #10 EN=1;
+    #10 D=0;
+    #20 $finish;
+end
+
+endmodule
