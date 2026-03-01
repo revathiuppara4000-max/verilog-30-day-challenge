@@ -1,0 +1,39 @@
+module sr_flipflop (
+    input S,
+    input R,
+    output reg Q,
+    output Qbar
+);
+assign Qbar = ~Q;
+always @(S or R)
+begin
+    if (S == 1'b0 && R == 1'b0)
+        Q = Q;
+    else if (S == 1'b0 && R == 1'b1)
+        Q = 1'b0;
+    else if (S == 1'b1 && R == 1'b0)
+        Q = 1'b1;
+    else
+        Q = 1'bx;
+end
+
+//tb
+`timescale 1ns/1ps
+module testbench;
+reg S, R;
+wire Q, Qbar;
+sr_flipflop uut(S, R, Q, Qbar);
+initial
+begin
+    $dumpfile("sr.vcd");
+    $dumpvars(0,testbench);
+    S=0; R=0; #10;
+    S=1; R=0; #10;
+    S=0; R=1; #10;
+    S=1; R=1; #10;
+    S=0; R=0; #10;
+    $finish;
+end
+endmodule
+
+endmodule
