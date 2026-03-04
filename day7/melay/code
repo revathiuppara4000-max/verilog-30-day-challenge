@@ -1,1 +1,74 @@
+module mealy_101(
+input clk,
+input rst,
+input x,
+output reg y
+);
+reg [1:0] state;
+parameter S0=2'b00, S1=2'b01, S2=2'b10;
+always @(posedge clk or posedge rst)
+begin
+if(rst)
+state <= S0;
+else
+begin
+case(state)
+S0:
+begin
+if(x==1)
+state <= S1;
+else
+state <= S0;
+y <= 0;
+end
+S1:
+begin
+if(x==0)
+state <= S2;
+else
+state <= S1;
+y <= 0;
+end
+S2:
+begin
+if(x==1)
+begin
+state <= S1;
+y <= 1;
+end
+else
+begin
+state <= S0;
+y <= 0;
+end
+end
+default: state <= S0;
+endcase
+end
+end
+endmodule
 
+
+//tb
+module tb;
+reg clk,rst,x;
+wire y;
+mealy_101 m(clk,rst,x,y);
+always #5 clk = ~clk;
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars(0,tb);
+clk = 0;
+rst = 1;
+x = 0;
+#10 rst = 0;
+#10 x = 1;
+#10 x = 0;
+#10 x = 1;
+#10 x = 1;
+#10 x = 0;
+#10 x = 1;
+#20 $finish;
+end
+endmodule
