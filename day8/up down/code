@@ -1,0 +1,41 @@
+module up_down_counter(clk,reset,mode,q);
+input clk;
+input reset;
+input mode;
+output [3:0] q;
+reg [3:0] q;
+always @(posedge clk)
+begin
+if(reset)
+q = 0;
+else if(mode)
+q = q + 1;
+else
+q = q - 1;
+end
+endmodule
+
+//tb
+
+module tb;
+reg clk;
+reg reset;
+reg mode;
+wire [3:0] q;
+up_down_counter u(clk,reset,mode,q);
+initial
+begin
+clk = 0;
+reset = 1;
+mode = 1;
+#10 reset = 0;
+#50 mode = 0;
+end
+always #5 clk = ~clk;
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars;
+#100 $finish;
+end
+endmodule
