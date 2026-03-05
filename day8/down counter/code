@@ -1,0 +1,31 @@
+module down_counter(clk,reset,q);
+input clk,reset;
+  output reg [3:0] q;
+always @(posedge clk)
+begin
+if(reset)
+q=4'b1111;
+else
+q=q-1;
+end
+endmodule
+
+//tb
+module tb;
+reg clk,reset;
+wire [3:0] q;
+down_counter u(clk,reset,q);
+initial
+begin
+clk=0;
+reset=1;
+#10 reset=0;
+end
+always #5 clk=~clk;
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars;
+#100 $finish;
+end
+endmodule
