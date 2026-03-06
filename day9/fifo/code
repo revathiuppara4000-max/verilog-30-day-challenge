@@ -1,0 +1,72 @@
+module fifo(clk,rst,wr_en,rd_en,data_in,data_out,full,empty);
+input clk,rst,wr_en,rd_en;
+input [7:0] data_in;
+output reg [7:0] data_out;
+output full,empty;
+reg [7:0] mem[7:0];
+reg [2:0] wptr,rptr;
+reg [3:0] count;
+assign full = (count==8);
+assign empty = (count==0);
+always @(posedge clk or posedge rst)
+begin
+    if(rst)
+    begin
+        wptr<=0;
+        rptr<=0;
+        count<=0;
+    end
+    else
+    begin
+        if(wr_en && !full)
+        begin
+            mem[wptr] <= data_in;
+            wptr <= wptr + 1;
+            count <= count + 1;
+        end     
+        if(rd_en && !empty)
+        begin
+            data_out <= mem[rptr];
+            rptr <= rptr + 1;
+            count <= count - 1;
+        end
+    end
+end
+endmodule
+
+//tb
+module fifo_tb;
+reg clk,rst,wr_en,rd_en;
+reg [7:0] data_in;
+wire [7:0] data_out;
+wire full,empty;
+fifo dut(clk,rst,wr_en,rd_en,data_in,data_out,full,empty);
+always #5 clk = ~clk;
+initial
+begin
+clk=0;
+rst=1;
+wr_en=0;
+rd_en=0;
+data_in=0;
+#10 rst=0;
+#10 wr_en=1; data_in=8'd10;
+#10 data_in=8'd20;
+#10 data_in=8'd30;
+#10 data_in=8'd40;
+#10 wr_en=0;
+#10 rd_en=1;
+#10;
+#10;
+#10;
+#10;
+#20 $finish;
+end
+initial
+begin
+$monitor("time=%0t wr=%b rd=%b data_in=%d data_out=%d full=%b empty=%b",
+$time,wr_en,rd_en,data_in,data_out,full,empty);
+$dumpfile("dump.vcd");
+$dumpvars;
+end
+endmodule
