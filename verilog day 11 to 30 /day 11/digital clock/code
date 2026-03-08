@@ -1,0 +1,57 @@
+module digital_clock(clk, reset, sec, min, hr);
+input clk, reset;
+output reg [5:0] sec;
+output reg [5:0] min;
+output reg [4:0] hr;
+always @(posedge clk or posedge reset)
+begin
+    if(reset)
+    begin
+        sec <= 0;
+        min <= 0;
+        hr  <= 0;
+    end
+    else
+    begin
+        sec <= sec + 1;
+        if(sec == 59)
+        begin
+            sec <= 0;
+            min <= min + 1;
+            if(min == 59)
+            begin
+                min <= 0;
+                hr <= hr + 1;
+                if(hr == 23)
+                    hr <= 0;
+            end
+        end
+    end
+end
+endmodule
+
+//tb
+module digital_clock_tb;
+reg clk;
+reg reset;
+wire [5:0] sec;
+wire [5:0] min;
+wire [4:0] hr;
+digital_clock d1(clk, reset, sec, min, hr);
+initial
+begin
+clk = 0;
+forever #5 clk = ~clk;
+end
+initial
+begin
+reset = 1;
+#10 reset = 0;
+#1000 $finish;
+end
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars(1, d1);
+end
+endmodule
