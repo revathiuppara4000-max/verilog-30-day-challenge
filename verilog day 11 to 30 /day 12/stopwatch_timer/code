@@ -1,0 +1,50 @@
+module stopwatch_timer(clk, reset, start, sec);
+input clk;
+input reset;
+input start;
+output reg [5:0] sec;
+always @(posedge clk or posedge reset)
+begin
+    if(reset)
+        sec <= 0;
+    else if(start)
+    begin
+        if(sec == 59)
+            sec <= 0;
+        else
+            sec <= sec + 1;
+    end
+end
+endmodule
+
+//tb
+module stopwatch_timer_tb;
+
+reg clk;
+reg reset;
+reg start;
+wire [5:0] sec;
+
+stopwatch_timer s1(clk, reset, start, sec);
+
+initial
+begin
+clk = 0;
+forever #5 clk = ~clk;
+end
+initial
+begin
+reset = 1;
+start = 0;
+#10 reset = 0;
+#20 start = 1;
+#200 start = 0;
+#50 start = 1;
+#200 $finish;
+end
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars(1,s1);
+end
+endmodule
