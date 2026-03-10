@@ -1,0 +1,35 @@
+module ring_counter(clk, reset, q);
+input clk;
+input reset;
+output reg [3:0] q;
+always @(posedge clk or posedge reset)
+begin
+    if(reset)
+        q <= 4'b0001;
+    else
+        q <= {q[2:0], q[3]};
+end
+endmodule
+//tb
+module ring_counter_tb;
+reg clk;
+reg reset;
+wire [3:0] q;
+ring_counter r1(clk, reset, q);
+initial
+begin
+clk = 0;
+forever #5 clk = ~clk;
+end
+initial
+begin
+reset = 1;
+#10 reset = 0;
+#100 $finish;
+end
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars(1,r1);
+end
+endmodule
