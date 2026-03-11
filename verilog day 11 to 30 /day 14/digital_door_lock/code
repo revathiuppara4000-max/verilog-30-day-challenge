@@ -1,0 +1,70 @@
+module digital_door_lock(
+input clk,
+input reset,
+input [3:0] pass_in,
+input enter,
+output reg unlock,
+output reg alarm
+);
+
+parameter PASSWORD = 4'b1010;
+reg [1:0] wrong;
+
+always @(posedge clk or posedge reset)
+begin
+    if(reset)
+    begin
+        unlock <= 0;
+        alarm <= 0;
+        wrong <= 0;
+    end
+    else if(enter)
+    begin
+        if(pass_in == PASSWORD)
+        begin
+            unlock <= 1;
+            alarm <= 0;
+            wrong <= 0;
+        end
+        else
+        begin
+            unlock <= 0;
+            wrong <= wrong + 1;
+            if(wrong == 2)
+                alarm <= 1;
+        end
+    end
+end
+
+
+//tb
+module digital_door_lock_tb;
+reg clk;
+reg reset;
+reg [3:0] pass_in;
+reg enter;
+wire unlock;
+wire alarm;
+digital_door_lock d1(clk,reset,pass_in,enter,unlock,alarm);
+always #5 clk = ~clk;
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars(0,digital_door_lock_tb);
+clk = 0;
+reset = 1;
+enter = 0;
+pass_in = 4'b0000;
+#10 reset = 0;
+#10 pass_in = 4'b0001; enter = 1;
+#10 enter = 0;
+#10 pass_in = 4'b0011; enter = 1;
+#10 enter = 0;
+#10 pass_in = 4'b0100; enter = 1;
+#10 enter = 0;
+#10 pass_in = 4'b1010; enter = 1;
+#10 enter = 0;
+#20 $finish;
+end
+endmodule
+endmodule
