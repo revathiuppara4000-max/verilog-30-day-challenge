@@ -1,0 +1,24 @@
+module odd_even(a,even);
+input [3:0] a;
+output even;
+assign even = ~a[0];
+endmodule
+
+//tb
+module odd_even_tb;
+reg [3:0] a;
+wire even;
+odd_even o1(a,even);
+initial
+begin
+$dumpfile("dump.vcd");
+$dumpvars(0,odd_even_tb);
+a = 4'b0000;
+#10 a = 4'b0001;
+#10 a = 4'b0010;
+#10 a = 4'b0011;
+#10 a = 4'b0100;
+#10 a = 4'b0101;
+#20 $finish;
+end
+endmodule
