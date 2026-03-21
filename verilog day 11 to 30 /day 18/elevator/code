@@ -1,0 +1,70 @@
+module elevator(clk, reset, req, current_floor, dir);
+
+input clk, reset;
+input [2:0] req;
+output reg [1:0] current_floor;
+output reg dir;
+
+always @(posedge clk)
+begin
+    if(reset)
+    begin
+        current_floor <= 0;
+        dir <= 0;
+    end
+    else
+    begin
+        if(req[current_floor] == 1'b0)
+        begin
+            if(req > (1 << current_floor))
+            begin
+                current_floor <= current_floor + 1;
+                dir <= 1;
+            end
+            else if(req < (1 << current_floor))
+            begin
+                current_floor <= current_floor - 1;
+                dir <= 0;
+            end
+        end
+    end
+end
+//tb
+module tb;
+
+reg clk;
+reg reset;
+reg [2:0] req;
+wire [1:0] current_floor;
+wire dir;
+
+elevator u(clk, reset, req, current_floor, dir);
+
+initial
+begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+initial
+begin
+    reset = 1;
+    req = 3'b000;
+    #10 reset = 0;
+
+    #10 req = 3'b100;
+    #50 req = 3'b001;
+    #50 req = 3'b010;
+
+    #100 $finish;
+end
+
+initial
+begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
+end
+
+endmodule
+
+endmodule
