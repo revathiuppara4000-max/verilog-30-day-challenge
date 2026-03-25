@@ -1,0 +1,87 @@
+module water_tank(clk, reset, low, high, motor);
+
+input clk, reset;
+input low, high;
+output reg motor;
+
+parameter OFF = 1'b0;
+parameter ON  = 1'b1;
+
+reg state;
+
+always @(posedge clk)
+begin
+    if(reset)
+    begin
+        state <= OFF;
+        motor <= 0;
+    end
+    else
+    begin
+        case(state)
+            OFF:
+            begin
+                if(low == 1)
+                begin
+                    state <= ON;
+                    motor <= 1;
+                end
+            end
+
+            ON:
+            begin
+                if(high == 1)
+                begin
+                    state <= OFF;
+                    motor <= 0;
+                end
+            end
+        endcase
+    end
+end
+
+endmodule
+
+//tb
+module tb;
+
+reg clk;
+reg reset;
+reg low;
+reg high;
+wire motor;
+
+water_tank uut(clk, reset, low, high, motor);
+
+initial
+begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+initial
+begin
+    reset = 1;
+    low = 0;
+    high = 0;
+    #10 reset = 0;
+
+    #10 low = 1;
+    #20 low = 0;
+
+    #30 high = 1;
+    #20 high = 0;
+
+    #30 low = 1;
+    #20 low = 0;
+
+    #100 $finish;
+end
+
+initial
+begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
+end
+
+endmodule
