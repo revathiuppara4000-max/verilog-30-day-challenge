@@ -1,0 +1,71 @@
+module door_bell(clk, reset, button, bell);
+
+input clk, reset, button;
+output reg bell;
+
+reg [3:0] count;
+
+always @(posedge clk)
+begin
+    if(reset)
+    begin
+        bell <= 0;
+        count <= 0;
+    end
+    else
+    begin
+        if(button)
+        begin
+            bell <= 1;
+            count <= 4'd10;
+        end
+        else if(count > 0)
+        begin
+            count <= count - 1;
+            bell <= 1;
+        end
+        else
+        begin
+            bell <= 0;
+        end
+    end
+end
+
+endmodule
+
+//tb
+module tb;
+
+reg clk;
+reg reset;
+reg button;
+wire bell;
+
+door_bell uut(clk, reset, button, bell);
+
+initial
+begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+initial
+begin
+    reset = 1;
+    button = 0;
+    #10 reset = 0;
+
+    #10 button = 1; #10 button = 0;
+
+    #100 button = 1; #10 button = 0;
+
+    #200 $finish;
+end
+
+initial
+begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
+end
+
+endmodule
