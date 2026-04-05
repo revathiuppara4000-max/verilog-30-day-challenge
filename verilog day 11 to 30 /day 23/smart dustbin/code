@@ -1,0 +1,78 @@
+module dustbin(clk, reset, sensor, lid);
+
+input clk, reset, sensor;
+output reg lid;
+
+reg [3:0] count;
+reg state;
+
+always @(posedge clk)
+begin
+    if(reset)
+    begin
+        lid <= 0;
+        count <= 0;
+        state <= 0;
+    end
+    else
+    begin
+        if(sensor)
+        begin
+            lid <= 1;
+            count <= 4'd10;
+            state <= 1;
+        end
+        else if(state)
+        begin
+            if(count > 0)
+            begin
+                count <= count - 1;
+                lid <= 1;
+            end
+            else
+            begin
+                lid <= 0;
+                state <= 0;
+            end
+        end
+    end
+end
+
+endmodule
+
+//tb
+module tb;
+
+reg clk;
+reg reset;
+reg sensor;
+wire lid;
+
+dustbin uut(clk, reset, sensor, lid);
+
+initial
+begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+initial
+begin
+    reset = 1;
+    sensor = 0;
+    #10 reset = 0;
+
+    #10 sensor = 1; #10 sensor = 0;
+
+    #100 sensor = 1; #10 sensor = 0;
+
+    #200 $finish;
+end
+
+initial
+begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
+end
+
+endmodule
